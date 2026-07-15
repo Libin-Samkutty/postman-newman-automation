@@ -26,6 +26,15 @@ jobs:
           name: nightly-regression-report
           path: reports/
           retention-days: 7
+      - name: Generate index redirect to latest report
+        if: always()
+        run: |
+          REPORT_DIR=$(ls -d reports/*/ | head -n1 | xargs basename)
+          cat > reports/index.html <<EOF
+          <!DOCTYPE html>
+          <html><head><meta http-equiv="refresh" content="0; url=./${REPORT_DIR}/regression-report.html"></head>
+          <body>Redirecting to <a href="./${REPORT_DIR}/regression-report.html">latest regression report</a>...</body></html>
+          EOF
       - uses: actions/upload-pages-artifact@v3
         if: always()
         with: { path: ./reports }

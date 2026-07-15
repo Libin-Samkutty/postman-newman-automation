@@ -1,5 +1,9 @@
 # postman-newman-automation
 
+[![Newman API Tests](https://github.com/Libin-Samkutty/postman-newman-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/Libin-Samkutty/postman-newman-automation/actions/workflows/ci.yml)
+[![Nightly Full Regression](https://github.com/Libin-Samkutty/postman-newman-automation/actions/workflows/nightly.yml/badge.svg)](https://github.com/Libin-Samkutty/postman-newman-automation/actions/workflows/nightly.yml)
+[![Latest Regression Report](https://img.shields.io/badge/report-latest%20regression-blue)](https://libin-samkutty.github.io/postman-newman-automation/)
+
 Collaborative API testing layer for the HealthSaaS platform, targeting the
 public [DummyJSON](https://dummyjson.com) API.
 
@@ -96,14 +100,34 @@ that a real deployment would use with per-environment base URLs.
 ## Docker
 
 ```bash
-npm run test:docker   # docker-compose up --build, runs regression, writes HTMLExtra report
+npm run test:docker   # docker compose up --build, runs regression, writes HTMLExtra report
 ```
 
 ## CI/CD
 
-- **GitHub Actions** (`.github/workflows/ci.yml`) — validate → smoke → regression → publish to Pages, gated on collection drift.
-- **Nightly** (`.github/workflows/nightly.yml`) — full regression via Docker, published to GitHub Pages.
+- **GitHub Actions** (`.github/workflows/ci.yml`) — validate → smoke → regression → publish to Pages, gated on collection drift. `regression` (and therefore `publish-report`) runs on pull requests *and* on every push to `main`.
+- **Nightly** (`.github/workflows/nightly.yml`) — full regression via Docker, published to GitHub Pages (manual trigger only, via `workflow_dispatch`).
 - **Jenkins** (`Jenkinsfile`) — parameterized by environment and suite, with JUnit + HTML Publisher reporting.
+
+### Enabling GitHub Pages
+
+The `publish-report` job (`ci.yml`) and nightly workflow both deploy via
+`actions/deploy-pages`, but GitHub Pages needs to be turned on once per repo
+before that can succeed:
+
+1. Repo **Settings → Pages**.
+2. Under **Build and deployment → Source**, select **GitHub Actions** (not
+   "Deploy from a branch").
+3. Push to `main` (or run the nightly workflow manually) — the next
+   successful `publish-report` / `full-regression` job will deploy, and the
+   Pages URL (`https://libin-samkutty.github.io/postman-newman-automation/`)
+   goes live.
+
+No separate `gh-pages` branch is committed. `run-regression.sh` writes each
+report into a fresh `reports/<timestamp>/` folder, so both publish jobs
+generate a small `reports/index.html` redirect (pointing at that run's
+timestamped report) before deploying — that's what the Pages root URL
+actually serves.
 
 ## Reporting stack
 
