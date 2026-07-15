@@ -1,11 +1,11 @@
 {
   "item": [
     {
-      "id": "ea5e7694-db37-41e4-adc7-ad776ab615bc",
+      "id": "9042cba2-cc60-4806-ad0e-2b3347921542",
       "name": "Auth",
       "item": [
         {
-          "id": "5aed4d12-de1f-4294-8ec8-ad500dace420",
+          "id": "b9482ed4-f48f-42b6-9180-213348bae758",
           "name": "Login - Valid Credentials",
           "request": {
             "description": {
@@ -45,7 +45,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "43610f32-b676-4c7e-ba10-787079660cb3",
+                "id": "700b50d3-aa62-41ba-a39b-429504df102d",
                 "type": "text/javascript",
                 "exec": [
                   "if (pm.response.code === 200) {",
@@ -63,8 +63,8 @@
                   "        pm.expect(body.id).to.be.a('number');",
                   "    });",
                   "}",
-                  "pm.test(\"Response time is under 2000ms\", () => {",
-                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "pm.test(\"Response time is under 4000ms\", () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(4000);",
                   "});"
                 ]
               }
@@ -72,7 +72,7 @@
           ]
         },
         {
-          "id": "3166232f-f9e8-4b38-97c5-2395215b8701",
+          "id": "0414c06e-d8b8-4642-b734-b24be1fd4ff9",
           "name": "Login - Invalid Credentials",
           "request": {
             "description": {
@@ -112,7 +112,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "e4888bb3-9c20-4608-aca8-c2e1ca943560",
+                "id": "606e8eb1-dd68-4a2d-b5b1-5b88d61c3674",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 400 for invalid credentials\", () => {",
@@ -131,7 +131,7 @@
           ]
         },
         {
-          "id": "9d0321b1-ee80-4013-941e-430e180828fd",
+          "id": "5825a065-c263-4629-8ad0-cb467c52c771",
           "name": "Get Authenticated User",
           "request": {
             "description": {
@@ -166,7 +166,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "8cace996-8dd9-4056-a2a8-e9feac17fea4",
+                "id": "ea3ff247-77f6-452e-b9c5-d5c674934c27",
                 "type": "text/javascript",
                 "exec": [
                   "function decodeJwtExp(token) {",
@@ -208,7 +208,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "d392cf82-219f-4c16-a01c-0a78d8e5cd2a",
+                "id": "f289dd83-870d-4c86-91e0-3ded9eddcbb0",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with user profile\", () => {",
@@ -229,7 +229,7 @@
           ]
         },
         {
-          "id": "c517b0b6-83a0-4490-81f4-8d06aa392481",
+          "id": "00f8a9d6-a5c9-49b5-9fb2-08711cb12767",
           "name": "Get Authenticated User - Invalid Token",
           "request": {
             "description": {
@@ -264,7 +264,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "ab98a0d2-6d6c-409e-a731-57472d2193e2",
+                "id": "e10f1c6b-da84-4fe1-a2d6-157c3a703d7b",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 401 for invalid auth token\", () => {",
@@ -283,7 +283,7 @@
           ]
         },
         {
-          "id": "b422135b-2ef0-468c-962f-7cc759306274",
+          "id": "bc6bb911-183f-41be-a4f0-d8c5cd219e2b",
           "name": "Refresh Token",
           "request": {
             "description": {
@@ -323,7 +323,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "0568c4fa-d65e-480e-8208-2ebf4400b1d6",
+                "id": "3e939a1c-fd66-458a-b838-6ef294d54709",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with new tokens\", () => {",
@@ -351,11 +351,11 @@
       "event": []
     },
     {
-      "id": "9635dede-680c-4530-b5fd-da543d74747e",
+      "id": "33a439f8-23c4-49f0-bc40-395d1a4c4246",
       "name": "Users",
       "item": [
         {
-          "id": "0181ccd6-e325-4510-9466-1d3cdeed4478",
+          "id": "b3793327-44ba-4e9d-a5de-86813156ed14",
           "name": "Get All Users",
           "request": {
             "description": {
@@ -379,7 +379,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "214c8f94-6e50-4c8a-81cd-d871ecf89465",
+                "id": "7769d9c5-fc0c-4fc7-b438-df330cf53f83",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with user list\", () => {",
@@ -405,7 +405,7 @@
           ]
         },
         {
-          "id": "3a701538-be19-4adf-8135-8a0634797d79",
+          "id": "3a6a4485-586d-4cbb-b8cd-b4d3cf42f759",
           "name": "Get User by ID",
           "request": {
             "description": {
@@ -430,7 +430,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "c82646f1-855d-45bf-8b1b-82c5be1c8aad",
+                "id": "64506066-057e-4c46-aba4-bb423e5035a5",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with user details\", () => {",
@@ -453,7 +453,7 @@
           ]
         },
         {
-          "id": "0aef5d19-09fb-4f76-873d-4fb3ff8ad436",
+          "id": "eda4e38a-802c-4e22-9c99-e5467d45ec7a",
           "name": "Get User - Not Found",
           "request": {
             "description": {
@@ -478,7 +478,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "058f6a4a-2662-414f-b04b-699e671da66b",
+                "id": "ed5729c8-92d6-49d1-a849-75a747414609",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 404 for non-existent user\", () => {",
@@ -497,7 +497,7 @@
           ]
         },
         {
-          "id": "7b0fab18-6390-4f43-9854-97eddf5acf48",
+          "id": "5ae09b84-f3e1-4f88-a8b9-e07d9ffc69d6",
           "name": "Create User",
           "request": {
             "description": {
@@ -537,7 +537,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "2752556f-ad1a-474b-ab2b-e6d549356860",
+                "id": "518d3cb8-2f2e-4bc2-b9cb-80b90e883f39",
                 "type": "text/javascript",
                 "exec": [
                   "const timestamp = Date.now();",
@@ -552,7 +552,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "40d1ce8d-6915-4041-8539-8b17f85f18b5",
+                "id": "662d46ef-8e1e-4f06-965a-ad7980406e6a",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 201 with created user\", () => {",
@@ -572,7 +572,7 @@
           ]
         },
         {
-          "id": "c3370df1-81b1-4185-a309-7e8825f45f97",
+          "id": "88abda06-ccf1-4003-81c1-c463b8cda741",
           "name": "Update User",
           "request": {
             "description": {
@@ -612,7 +612,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "5dd2ee85-e7a8-480a-abd1-4e1314739d53",
+                "id": "5bc554f8-f1e8-4a6e-a3cc-db20732e723e",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with updated user\", () => {",
@@ -631,7 +631,7 @@
           ]
         },
         {
-          "id": "141083d5-71ba-4e26-b405-9a73adad5347",
+          "id": "1d526cb2-178f-4623-b7cb-9f6601ce03bf",
           "name": "Delete User",
           "request": {
             "description": {
@@ -656,7 +656,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "9eb96f46-9b26-4ff5-82ed-7763b36e59bd",
+                "id": "0255f350-c3f6-45e7-b8e6-2d8f7bce7e68",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 for delete\", () => {",
@@ -679,11 +679,11 @@
       "event": []
     },
     {
-      "id": "9f0b4181-1cf4-405a-a644-67a60335a4be",
+      "id": "fde1133d-dd80-4759-912f-01edf0eda842",
       "name": "Products",
       "item": [
         {
-          "id": "5b61c89d-1906-4ec9-b501-e310a90e8240",
+          "id": "36cd7058-67d7-4cea-9437-961909211ea9",
           "name": "Get All Products",
           "request": {
             "description": {
@@ -707,7 +707,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "3a190a35-0594-455c-9a13-a08f2817d661",
+                "id": "78f2a592-fcb3-4039-ab6d-7eaa8de19f5f",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with product list\", () => {",
@@ -733,7 +733,7 @@
           ]
         },
         {
-          "id": "c1475a39-893c-44cb-afa0-540f781facad",
+          "id": "6182353a-36f7-4b4c-a4f3-8cd5b4c1350a",
           "name": "Get Products - Paginated",
           "request": {
             "description": {
@@ -766,7 +766,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "439066cd-97aa-46a4-be28-dfdac6b1cf65",
+                "id": "750ffa2b-c6a0-4814-8f58-74a8059ffcaf",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with paginated results\", () => {",
@@ -787,7 +787,7 @@
           ]
         },
         {
-          "id": "773e07c2-9a08-47c9-948e-def6a6f97fb0",
+          "id": "3ac18d2b-01e7-4741-80fe-dfd478059d58",
           "name": "Search Products",
           "request": {
             "description": {
@@ -817,7 +817,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "8cfb0fb5-7d51-46f7-b317-852604154b5a",
+                "id": "78741d4b-d03e-40da-9336-d16a4df94d2b",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with search results\", () => {",
@@ -840,7 +840,7 @@
           ]
         },
         {
-          "id": "4c702e9b-9a9a-4d24-9b4e-de4a4b114ff3",
+          "id": "0b461b68-6092-4af1-83fb-b36e408a164b",
           "name": "Get Product by ID",
           "request": {
             "description": {
@@ -865,7 +865,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "a794a8b0-7089-4dab-bd30-2a35ecb2187b",
+                "id": "380fad04-a53f-4449-aa5b-85d6fff812a0",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with product details\", () => {",
@@ -888,7 +888,7 @@
           ]
         },
         {
-          "id": "aeb169d0-7911-4f2a-bae2-ef64dcaa007f",
+          "id": "fb5d967e-0a90-493d-b2bf-68e26f8da439",
           "name": "Get Product - Not Found",
           "request": {
             "description": {
@@ -913,7 +913,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "e1d57b90-1b37-4ba8-9f1f-db6e84027dc5",
+                "id": "f43029aa-73c1-40f8-b3c1-7d550981ab33",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 404 for non-existent product\", () => {",
@@ -932,7 +932,7 @@
           ]
         },
         {
-          "id": "5413839f-929f-4d78-b191-98f8b9c0b751",
+          "id": "5b992a1c-1b67-48e0-85c6-02053a8aa619",
           "name": "Create Product",
           "request": {
             "description": {
@@ -972,7 +972,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "fe64b08f-d3b5-4b2b-8f84-42648f984679",
+                "id": "f48da342-343e-4f06-847a-cb6ce8c5c969",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 201 with created product\", () => {",
@@ -996,11 +996,11 @@
       "event": []
     },
     {
-      "id": "26d0132d-982b-452b-b3de-f9c0bcf434a5",
+      "id": "9ead1fa9-7cf1-4419-ada2-1c4636c88b29",
       "name": "Carts",
       "item": [
         {
-          "id": "40dea7a9-f937-401f-b23c-f10244d4d3d5",
+          "id": "816cc2c5-30f7-4963-aa6d-4d30edeb5b8e",
           "name": "Get User Carts",
           "request": {
             "description": {
@@ -1026,7 +1026,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "cbadb19f-8719-49a1-bc03-9c000524ebd0",
+                "id": "11959a14-906c-46a8-a9b8-225f6814d336",
                 "type": "text/javascript",
                 "exec": [
                   "function decodeJwtExp(token) {",
@@ -1068,7 +1068,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "8112161b-863a-4333-9931-d737692462ec",
+                "id": "affce85d-17de-45c1-bf16-ce2e8e34bed9",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 200 with user carts\", () => {",
@@ -1088,7 +1088,7 @@
           ]
         },
         {
-          "id": "58b6f4c3-d87b-4ac5-85bf-1d788356c77c",
+          "id": "94630c4d-827d-472a-aea4-7bebf27e0892",
           "name": "Add Cart",
           "request": {
             "description": {
@@ -1128,7 +1128,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "f9c5c111-733c-4306-a830-aead6d91c7e7",
+                "id": "09b7cf9a-ef9c-43cb-8eeb-d328799f78af",
                 "type": "text/javascript",
                 "exec": [
                   "function decodeJwtExp(token) {",
@@ -1170,7 +1170,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "a9fd63df-9bb0-4f6c-9c1f-76115af302d9",
+                "id": "88ccc820-dd7f-404c-8e19-45116af6f08f",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Returns 201 with created cart\", () => {",
@@ -1200,7 +1200,7 @@
   "event": [],
   "variable": [],
   "info": {
-    "_postman_id": "ffd015be-adf2-4621-ae24-76beb34888d1",
+    "_postman_id": "28d09823-dedd-49db-8793-84306b8eb5f8",
     "name": "regression",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": {

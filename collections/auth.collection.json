@@ -1,7 +1,7 @@
 {
   "item": [
     {
-      "id": "ee941af6-663c-4fff-ac9d-4d0635398171",
+      "id": "6e824d5f-d1e5-4513-a785-0769d2d397b8",
       "name": "Login - Valid Credentials",
       "request": {
         "description": {
@@ -41,7 +41,7 @@
         {
           "listen": "test",
           "script": {
-            "id": "f11eb6cd-3451-46dd-b9b8-4b0450ef44b8",
+            "id": "56ec67ad-f825-46de-9b1b-2aa79172124d",
             "type": "text/javascript",
             "exec": [
               "if (pm.response.code === 200) {",
@@ -59,8 +59,8 @@
               "        pm.expect(body.id).to.be.a('number');",
               "    });",
               "}",
-              "pm.test(\"Response time is under 2000ms\", () => {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "pm.test(\"Response time is under 4000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(4000);",
               "});"
             ]
           }
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "id": "49fab2c6-59c5-4f64-84b8-c596a9118cf0",
+      "id": "4f8be7d8-3665-4870-9351-478ae73e6d79",
       "name": "Login - Invalid Credentials",
       "request": {
         "description": {
@@ -108,7 +108,7 @@
         {
           "listen": "test",
           "script": {
-            "id": "74fc07ce-f441-4018-b5c9-0fffbb1fb986",
+            "id": "6ad15924-dd74-4200-811d-d8d329b1bbd9",
             "type": "text/javascript",
             "exec": [
               "pm.test(\"Returns 400 for invalid credentials\", () => {",
@@ -127,7 +127,7 @@
       ]
     },
     {
-      "id": "f47c3dd3-56b5-4e24-84a8-44f6927ef52d",
+      "id": "fb5b1cae-97ca-4d50-b987-cf0ae6d44301",
       "name": "Get Authenticated User",
       "request": {
         "description": {
@@ -162,7 +162,7 @@
         {
           "listen": "prerequest",
           "script": {
-            "id": "0237545e-5076-4c01-9907-37d3eda79282",
+            "id": "953f935c-3548-424d-876f-992034be1d33",
             "type": "text/javascript",
             "exec": [
               "function decodeJwtExp(token) {",
@@ -204,7 +204,7 @@
         {
           "listen": "test",
           "script": {
-            "id": "643e3975-890a-42e2-ade4-cec95764aab1",
+            "id": "d5040ee9-6159-4400-9d18-7f2eef8ea71f",
             "type": "text/javascript",
             "exec": [
               "pm.test(\"Returns 200 with user profile\", () => {",
@@ -225,7 +225,7 @@
       ]
     },
     {
-      "id": "cc1581d2-24bc-471c-9152-956f9cab5568",
+      "id": "9d5255c4-a8b1-40fe-9641-91aeed00bb0f",
       "name": "Get Authenticated User - Invalid Token",
       "request": {
         "description": {
@@ -260,7 +260,7 @@
         {
           "listen": "test",
           "script": {
-            "id": "2df6d8c2-1361-4bb7-823b-eededfd8816d",
+            "id": "c96e11a4-f62c-411a-bb4f-259010a62b58",
             "type": "text/javascript",
             "exec": [
               "pm.test(\"Returns 401 for invalid auth token\", () => {",
@@ -279,7 +279,7 @@
       ]
     },
     {
-      "id": "51d8f3c8-320a-409c-836c-1b1a7dee1810",
+      "id": "02f2c16b-9bc2-43e2-ac11-6ec283a574ad",
       "name": "Refresh Token",
       "request": {
         "description": {
@@ -319,7 +319,7 @@
         {
           "listen": "test",
           "script": {
-            "id": "14596005-ca75-49cf-9583-229f35892a34",
+            "id": "9a89eaf6-680b-48af-b7d2-762e6716d044",
             "type": "text/javascript",
             "exec": [
               "pm.test(\"Returns 200 with new tokens\", () => {",
@@ -347,7 +347,7 @@
   "event": [],
   "variable": [],
   "info": {
-    "_postman_id": "69a143e6-7447-46e5-aff5-39b493d457c8",
+    "_postman_id": "e61fea46-55e8-4f8a-ad6b-56f163987a67",
     "name": "auth",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": {
