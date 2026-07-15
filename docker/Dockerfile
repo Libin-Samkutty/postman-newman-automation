@@ -6,7 +6,7 @@ COPY collections/ ./collections/
 COPY environments/ ./environments/
 COPY data/ ./data/
 
-RUN npm install newman-reporter-htmlextra
+RUN npm install -g newman-reporter-htmlextra
 
 ENTRYPOINT ["newman"]
 CMD ["run", "collections/regression.collection.json", \
