@@ -9,7 +9,7 @@
     "test:smoke": "newman run collections/auth.collection.json -e environments/staging.environment.json -r cli,htmlextra --reporter-htmlextra-export reports/smoke.html",
     "test:regression": "bash scripts/run-regression.sh staging",
     "test:data-driven": "newman run collections/users.collection.json --iteration-data data/users.csv -e environments/staging.environment.json -r cli,htmlextra --reporter-htmlextra-export reports/users-data-driven.html",
-    "test:docker": "docker-compose -f docker/docker-compose.yml up --build --exit-code-from newman newman",
+    "test:docker": "docker compose -f docker/docker-compose.yml up --build --exit-code-from newman newman",
     "validate": "bash scripts/validate-collections.sh"
   },
   "devDependencies": {
