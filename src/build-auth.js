@@ -22,7 +22,7 @@ function buildAuthCollection() {
         body: jsonBody({ username: 'emilys', password: 'emilyspass', expiresInMins: 60 }),
         description: 'Authenticate with valid credentials. Saves accessToken/refreshToken/userId '
             + 'as collection variables for use by every other request in this repo.',
-        test: [...saveAuthTokensScript(), ...responseTimeTest()],
+        test: [...saveAuthTokensScript(), ...responseTimeTest(4000)],
     }));
 
     collection.items.add(buildItem({

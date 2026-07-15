@@ -41,7 +41,7 @@ jobs:
   regression:
     name: Full API Regression
     needs: smoke
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,6 +68,14 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with: { name: regression-report, path: ./reports }
+      - name: Generate index redirect to latest report
+        run: |
+          REPORT_DIR=$(ls -d reports/*/ | head -n1 | xargs basename)
+          cat > reports/index.html <<EOF
+          <!DOCTYPE html>
+          <html><head><meta http-equiv="refresh" content="0; url=./${REPORT_DIR}/regression-report.html"></head>
+          <body>Redirecting to <a href="./${REPORT_DIR}/regression-report.html">latest regression report</a>...</body></html>
+          EOF
       - uses: actions/upload-pages-artifact@v3
         with: { path: ./reports }
       - uses: actions/deploy-pages@v4
