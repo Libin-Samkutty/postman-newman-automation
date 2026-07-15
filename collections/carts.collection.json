@@ -1,0 +1,209 @@
+{
+  "item": [
+    {
+      "id": "ac70640e-d927-400d-a963-f2716bb1361d",
+      "name": "Get User Carts",
+      "request": {
+        "description": {
+          "content": "Get all carts belonging to the logged-in user. Expected: 200 with { carts[], total, skip, limit }.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "carts",
+            "user",
+            "{{userId}}"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "95d3c4f2-ce68-428f-b6ff-a5ed21771905",
+            "type": "text/javascript",
+            "exec": [
+              "function decodeJwtExp(token) {",
+              "    try {",
+              "        return JSON.parse(atob(token.split('.')[1])).exp;",
+              "    } catch (e) {",
+              "        return null;",
+              "    }",
+              "}",
+              "",
+              "const existingToken = pm.collectionVariables.get('accessToken');",
+              "const existingUserId = pm.collectionVariables.get('userId');",
+              "const nowSeconds = Math.floor(Date.now() / 1000);",
+              "const bufferSeconds = 60;",
+              "const exp = existingToken ? decodeJwtExp(existingToken) : null;",
+              "const needsReauth = !existingToken || !existingUserId || !exp || (exp - nowSeconds) < bufferSeconds;",
+              "",
+              "if (needsReauth) {",
+              "    pm.sendRequest({",
+              "        url: pm.variables.get('baseUrl') + '/auth/login',",
+              "        method: 'POST',",
+              "        header: { 'Content-Type': 'application/json' },",
+              "        body: {",
+              "            mode: 'raw',",
+              "            raw: JSON.stringify({ username: 'emilys', password: 'emilyspass', expiresInMins: 60 }),",
+              "        },",
+              "    }, (err, res) => {",
+              "        if (!err && res.code === 200) {",
+              "            const body = res.json();",
+              "            pm.collectionVariables.set('accessToken', body.accessToken);",
+              "            pm.collectionVariables.set('refreshToken', body.refreshToken);",
+              "            pm.collectionVariables.set('userId', body.id);",
+              "        }",
+              "    });",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "id": "1259c3e2-a056-475b-abc2-065023000ead",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with user carts\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Response has carts array and pagination fields', () => {",
+              "    pm.expect(body.carts).to.be.an('array');",
+              "    pm.expect(body.total).to.be.a('number');",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "001c1a2d-6430-4e3d-ab7c-c55e959a4e0f",
+      "name": "Add Cart",
+      "request": {
+        "description": {
+          "content": "Create a new cart for the logged-in user. Expected: 201 with the new cart, including a computed total.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "carts",
+            "add"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"products\": [\n    {\n      \"id\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"id\": 2,\n      \"quantity\": 1\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "8cccb0ea-1352-43d3-a3a2-f2c3613d5b82",
+            "type": "text/javascript",
+            "exec": [
+              "function decodeJwtExp(token) {",
+              "    try {",
+              "        return JSON.parse(atob(token.split('.')[1])).exp;",
+              "    } catch (e) {",
+              "        return null;",
+              "    }",
+              "}",
+              "",
+              "const existingToken = pm.collectionVariables.get('accessToken');",
+              "const existingUserId = pm.collectionVariables.get('userId');",
+              "const nowSeconds = Math.floor(Date.now() / 1000);",
+              "const bufferSeconds = 60;",
+              "const exp = existingToken ? decodeJwtExp(existingToken) : null;",
+              "const needsReauth = !existingToken || !existingUserId || !exp || (exp - nowSeconds) < bufferSeconds;",
+              "",
+              "if (needsReauth) {",
+              "    pm.sendRequest({",
+              "        url: pm.variables.get('baseUrl') + '/auth/login',",
+              "        method: 'POST',",
+              "        header: { 'Content-Type': 'application/json' },",
+              "        body: {",
+              "            mode: 'raw',",
+              "            raw: JSON.stringify({ username: 'emilys', password: 'emilyspass', expiresInMins: 60 }),",
+              "        },",
+              "    }, (err, res) => {",
+              "        if (!err && res.code === 200) {",
+              "            const body = res.json();",
+              "            pm.collectionVariables.set('accessToken', body.accessToken);",
+              "            pm.collectionVariables.set('refreshToken', body.refreshToken);",
+              "            pm.collectionVariables.set('userId', body.id);",
+              "        }",
+              "    });",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "id": "fffc87db-60f8-4e06-9de3-693ad0e5b9dc",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 201 with created cart\", () => {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "const schema = {\"type\":\"object\",\"required\":[\"id\",\"products\",\"total\",\"userId\"],\"properties\":{\"id\":{\"type\":\"number\"},\"products\":{\"type\":\"array\"},\"total\":{\"type\":\"number\",\"minimum\":0},\"userId\":{\"type\":\"number\"}}};",
+              "const body = pm.response.json();",
+              "pm.test('Created cart matches schema', () => {",
+              "    pm.expect(tv4.validate(body, schema)).to.be.true;",
+              "});",
+              "pm.test('Cart total reflects submitted products', () => {",
+              "    pm.expect(body.totalProducts).to.eql(2);",
+              "    pm.expect(body.total).to.be.above(0);",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [],
+  "info": {
+    "_postman_id": "febf15d7-59bc-434a-abb9-e2cea7924810",
+    "name": "carts",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Cart endpoints, keyed off {{userId}}. A pre-request script (the same JWT-expiry-aware auto-login used in the auth collection) guarantees a fresh {{userId}} is set, so these requests work standalone, not only after the auth collection has run.",
+      "type": "text/plain"
+    }
+  }
+}

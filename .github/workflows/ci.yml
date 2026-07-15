@@ -1,0 +1,73 @@
+name: Newman API Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate Collections
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - name: Check collections are built from src/ (no drift)
+        run: npm run check:collections-drift
+      - name: Validate collection syntax
+        run: bash scripts/validate-collections.sh
+
+  smoke:
+    name: API Smoke Tests
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - name: Run smoke tests
+        run: npm run test:smoke
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-report
+          path: reports/smoke.html
+
+  regression:
+    name: Full API Regression
+    needs: smoke
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - name: Run regression via Docker
+        run: npm run test:docker
+      - name: Upload regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-report
+          path: reports/
+
+  publish-report:
+    name: Publish to GitHub Pages
+    needs: regression
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: regression-report, path: ./reports }
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: ./reports }
+      - uses: actions/deploy-pages@v4

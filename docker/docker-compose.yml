@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  newman:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      ENVIRONMENT: staging
+    volumes:
+      - ../reports:/reports
+    command: >
+      run collections/regression.collection.json
+      --environment environments/staging.environment.json
+      --reporters cli,htmlextra
+      --reporter-htmlextra-export /reports/regression-report.html
+      --reporter-htmlextra-title "HealthSaaS API Regression"

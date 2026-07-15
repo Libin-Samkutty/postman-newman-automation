@@ -1,0 +1,325 @@
+{
+  "item": [
+    {
+      "id": "cc0af983-ec11-4260-a684-200a00033b67",
+      "name": "Get All Products",
+      "request": {
+        "description": {
+          "content": "Get the full list of products (default limit: 30). Expected: 200 with { products[], total, skip, limit }.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "products"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "8a19d660-40b4-4543-a37a-f45f6f15cf89",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with product list\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Response has products array and pagination fields', () => {",
+              "    pm.expect(body.products).to.be.an('array').and.not.empty;",
+              "    pm.expect(body.total).to.be.a('number');",
+              "    pm.expect(body.skip).to.be.a('number');",
+              "    pm.expect(body.limit).to.be.a('number');",
+              "});",
+              "const schema = {\"type\":\"object\",\"required\":[\"id\",\"title\",\"price\",\"category\"],\"properties\":{\"id\":{\"type\":\"number\"},\"title\":{\"type\":\"string\"},\"price\":{\"type\":\"number\",\"minimum\":0},\"category\":{\"type\":\"string\"}}};",
+              "pm.test('First product matches schema', () => {",
+              "    pm.expect(tv4.validate(body.products[0], schema)).to.be.true;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "0df9ada0-8758-42c8-85d9-585af86c225a",
+      "name": "Get Products - Paginated",
+      "request": {
+        "description": {
+          "content": "Get a paginated subset of products (page 2, 10 per page). Expected: 200 with skip: 10 and limit: 10 in the response.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "products"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "skip",
+              "value": "10"
+            }
+          ],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "c63cef45-b3fc-41b8-b93e-649bbd768fb1",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with paginated results\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Pagination fields match the request', () => {",
+              "    pm.expect(body.products).to.be.an('array');",
+              "    pm.expect(body.limit).to.eql(10);",
+              "    pm.expect(body.skip).to.eql(10);",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "204b76a0-79ed-4b03-979b-d6538161754b",
+      "name": "Search Products",
+      "request": {
+        "description": {
+          "content": "Search products by keyword. Expected: 200 with matching products only.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "products",
+            "search"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "phone"
+            }
+          ],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "1df1d1d4-5237-491f-80ee-989deba4bdaa",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with search results\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('All results match the search term', () => {",
+              "    pm.expect(body.products).to.be.an('array');",
+              "    body.products.forEach((p) => {",
+              "        const haystack = `${p.title} ${p.description}`.toLowerCase();",
+              "        pm.expect(haystack).to.include('phone');",
+              "    });",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "68cea94c-bd0e-4309-8d7f-38859d58322d",
+      "name": "Get Product by ID",
+      "request": {
+        "description": {
+          "content": "Get a single product by ID. Expected: 200 with full product details matching schema.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "products",
+            "1"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "9b30406c-73aa-4590-871b-4d86d009e54f",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with product details\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const schema = {\"type\":\"object\",\"required\":[\"id\",\"title\",\"price\",\"category\"],\"properties\":{\"id\":{\"type\":\"number\"},\"title\":{\"type\":\"string\"},\"price\":{\"type\":\"number\",\"minimum\":0},\"category\":{\"type\":\"string\"}}};",
+              "const response = pm.response.json();",
+              "pm.test(\"Response matches product schema\", () => {",
+              "    pm.expect(tv4.validate(response, schema)).to.be.true;",
+              "});",
+              "pm.test('Requested product id matches', () => {",
+              "    pm.expect(response.id).to.eql(1);",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "3de3f005-9a95-414a-95eb-fd6a5599c63e",
+      "name": "Get Product - Not Found",
+      "request": {
+        "description": {
+          "content": "Request a product with an ID that does not exist. Expected: 404.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "products",
+            "99999"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "3e4bd265-2e0a-4307-bb21-20b47c5edfb5",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 404 for non-existent product\", () => {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});",
+              "pm.test(\"Error message present\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.message).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "f2fe618f-4089-4d06-af0e-dc9534d6008c",
+      "name": "Create Product",
+      "request": {
+        "description": {
+          "content": "Create a new product. DummyJSON simulates the creation but does not persist data. Expected: 201 with a server-assigned id.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "products",
+            "add"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Product\",\n  \"description\": \"A product created for automation testing\",\n  \"price\": 99.99,\n  \"stock\": 50,\n  \"category\": \"electronics\",\n  \"brand\": \"TestBrand\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "3683a1c9-c2fe-46b3-a07a-541e67c4f913",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 201 with created product\", () => {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Created product echoes submitted fields', () => {",
+              "    pm.expect(body.id).to.be.a('number');",
+              "    pm.expect(body.title).to.eql('Test Product');",
+              "    pm.expect(body.price).to.eql(99.99);",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [],
+  "info": {
+    "_postman_id": "a2fc910d-7bbc-4ad9-a3bc-b039eafce2a1",
+    "name": "products",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Product endpoints: list, paginate, search, get by ID, create.",
+      "type": "text/plain"
+    }
+  }
+}

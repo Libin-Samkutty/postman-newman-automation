@@ -1,0 +1,33 @@
+name: Nightly Full Regression
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  full-regression:
+    name: Full Regression + Report Publish
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - name: Check collections are built from src/ (no drift)
+        run: npm run check:collections-drift
+      - name: Run full regression via Docker
+        run: npm run test:docker
+      - name: Upload regression report artefact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-regression-report
+          path: reports/
+          retention-days: 7
+      - uses: actions/upload-pages-artifact@v3
+        if: always()
+        with: { path: ./reports }
+      - uses: actions/deploy-pages@v4
+        if: always()

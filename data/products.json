@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Data-Driven Widget",
+    "description": "Product created via data-driven Newman run",
+    "price": 49.99,
+    "stock": 20,
+    "category": "electronics",
+    "brand": "TestBrand"
+  },
+  {
+    "title": "Data-Driven Gadget",
+    "description": "Second product created via data-driven Newman run",
+    "price": 129.5,
+    "stock": 5,
+    "category": "electronics",
+    "brand": "TestBrand"
+  }
+]

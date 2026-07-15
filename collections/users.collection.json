@@ -1,0 +1,336 @@
+{
+  "item": [
+    {
+      "id": "63daf267-f100-4c1a-9dd2-b05f1258f474",
+      "name": "Get All Users",
+      "request": {
+        "description": {
+          "content": "Get the full list of users (default limit: 30). Expected: 200 with { users[], total, skip, limit }.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "users"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "7822b346-832f-4599-8257-100dff95ceef",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with user list\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Response has users array and pagination fields', () => {",
+              "    pm.expect(body.users).to.be.an('array').and.not.empty;",
+              "    pm.expect(body.total).to.be.a('number');",
+              "    pm.expect(body.skip).to.be.a('number');",
+              "    pm.expect(body.limit).to.be.a('number');",
+              "});",
+              "const schema = {\"type\":\"object\",\"required\":[\"id\",\"firstName\",\"lastName\",\"email\",\"age\"],\"properties\":{\"id\":{\"type\":\"number\"},\"firstName\":{\"type\":\"string\"},\"lastName\":{\"type\":\"string\"},\"email\":{\"type\":\"string\",\"format\":\"email\"},\"age\":{\"type\":\"number\",\"minimum\":0}}};",
+              "pm.test('First user matches schema', () => {",
+              "    pm.expect(tv4.validate(body.users[0], schema)).to.be.true;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "1f671867-570d-45e0-85ab-a2fe2e20ce0a",
+      "name": "Get User by ID",
+      "request": {
+        "description": {
+          "content": "Get a single user by ID. Expected: 200 with full user profile matching schema.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "users",
+            "1"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "7302ab2f-d2a3-48bb-b00f-83d038db7225",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with user details\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const schema = {\"type\":\"object\",\"required\":[\"id\",\"firstName\",\"lastName\",\"email\",\"age\"],\"properties\":{\"id\":{\"type\":\"number\"},\"firstName\":{\"type\":\"string\"},\"lastName\":{\"type\":\"string\"},\"email\":{\"type\":\"string\",\"format\":\"email\"},\"age\":{\"type\":\"number\",\"minimum\":0}}};",
+              "const response = pm.response.json();",
+              "pm.test(\"Response matches user schema\", () => {",
+              "    pm.expect(tv4.validate(response, schema)).to.be.true;",
+              "});",
+              "pm.test('Requested user id matches', () => {",
+              "    pm.expect(response.id).to.eql(1);",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "c98869f0-2514-4e34-8457-d5b6692dbdca",
+      "name": "Get User - Not Found",
+      "request": {
+        "description": {
+          "content": "Request a user with an ID that does not exist. Expected: 404.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "users",
+            "99999"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "22eb6706-1e6f-483e-9fd5-3f8b45f50041",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 404 for non-existent user\", () => {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});",
+              "pm.test(\"Error message present\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.message).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "802347b5-7d8c-4832-b8c6-b4754ed1bcc7",
+      "name": "Create User",
+      "request": {
+        "description": {
+          "content": "Create a new user. firstName/lastName/email come from --iteration-data (see data/users.csv) when run data-driven, or a timestamp-based fallback otherwise, so repeat runs don't collide. DummyJSON simulates the creation and assigns a server-side id.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "users",
+            "add"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"{{dynamicFirstName}}\",\n  \"lastName\": \"{{dynamicLastName}}\",\n  \"email\": \"{{dynamicEmail}}\",\n  \"age\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "093146f3-ea03-4f87-964c-b849f1137d49",
+            "type": "text/javascript",
+            "exec": [
+              "const timestamp = Date.now();",
+              "// Falls back to timestamp-based generation on a plain run; picks up",
+              "// per-row values automatically when run with --iteration-data (see data/users.csv).",
+              "pm.variables.set('dynamicFirstName', pm.iterationData.get('firstName') || `Test_${timestamp}`);",
+              "pm.variables.set('dynamicLastName', pm.iterationData.get('lastName') || 'Automation');",
+              "pm.variables.set('dynamicEmail', pm.iterationData.get('email') || `testuser_${timestamp}@healthsaas.com`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "id": "99d819cb-8088-44f7-9a83-9968b23c8bb9",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 201 with created user\", () => {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Created user has server-assigned id', () => {",
+              "    pm.expect(body.id).to.be.a('number');",
+              "});",
+              "pm.collectionVariables.set('createdUserId', body.id);",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "8a79b627-f2d2-4ca6-af26-476ed33d8370",
+      "name": "Update User",
+      "request": {
+        "description": {
+          "content": "Update a seeded user by ID. Note: user 2 exists in the fixed DummyJSON dataset — the id from Create User cannot be reused here, since /users/add is simulated and doesn't persist a real record to update or delete. Expected: 200 with the updated field echoed back.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "users",
+            "2"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "PUT",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Updated\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "4580d5b3-30e1-4285-b0ec-34c56136894d",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with updated user\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Updated field is echoed back', () => {",
+              "    pm.expect(body.firstName).to.eql('Updated');",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "2a043cf9-aa98-4eff-ab21-d6219b4a9928",
+      "name": "Delete User",
+      "request": {
+        "description": {
+          "content": "Delete a seeded user by ID (see note on Update User re: why a fixed id is used instead of {{createdUserId}}). Expected: 200 with isDeleted: true.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "users",
+            "2"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "method": "DELETE"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "c83b963b-0fb9-4270-8be0-11c6719b3ee0",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 for delete\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('User marked as deleted', () => {",
+              "    pm.expect(body.isDeleted).to.be.true;",
+              "    pm.expect(body.deletedOn).to.be.a('string');",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [],
+  "info": {
+    "_postman_id": "dff63800-3332-4fe6-bf3f-e139e9fe5104",
+    "name": "users",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "User CRUD: list, get, create, update, delete — with schema validation and negative cases. DummyJSON simulates writes; nothing persists server-side.",
+      "type": "text/plain"
+    }
+  }
+}

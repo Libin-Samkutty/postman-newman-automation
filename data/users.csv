@@ -1,0 +1,4 @@
+firstName,lastName,email,age
+Alice,Smith,alice_{{$randomInt}}@test.com,28
+Bob,Jones,bob_{{$randomInt}}@test.com,34
+Carol,White,carol_{{$randomInt}}@test.com,25

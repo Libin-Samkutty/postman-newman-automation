@@ -1,0 +1,358 @@
+{
+  "item": [
+    {
+      "id": "ee941af6-663c-4fff-ac9d-4d0635398171",
+      "name": "Login - Valid Credentials",
+      "request": {
+        "description": {
+          "content": "Authenticate with valid credentials. Saves accessToken/refreshToken/userId as collection variables for use by every other request in this repo.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "auth",
+            "login"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"emilys\",\n  \"password\": \"emilyspass\",\n  \"expiresInMins\": 60\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "f11eb6cd-3451-46dd-b9b8-4b0450ef44b8",
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const body = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', body.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', body.refreshToken);",
+              "    pm.collectionVariables.set('userId', body.id);",
+              "    pm.test('Login succeeded and tokens saved', () => {",
+              "        pm.expect(body.accessToken).to.be.a('string').and.not.empty;",
+              "        pm.expect(body.refreshToken).to.be.a('string').and.not.empty;",
+              "    });",
+              "    pm.test('Response contains user data', () => {",
+              "        pm.expect(body.username).to.eql('emilys');",
+              "        pm.expect(body.email).to.be.a('string');",
+              "        pm.expect(body.id).to.be.a('number');",
+              "    });",
+              "}",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "49fab2c6-59c5-4f64-84b8-c596a9118cf0",
+      "name": "Login - Invalid Credentials",
+      "request": {
+        "description": {
+          "content": "Attempt login with wrong credentials. Expected: 400.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "auth",
+            "login"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"invalid_user\",\n  \"password\": \"wrong_password\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "74fc07ce-f441-4018-b5c9-0fffbb1fb986",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 400 for invalid credentials\", () => {",
+              "    pm.expect(pm.response.code).to.eql(400);",
+              "});",
+              "pm.test(\"Error message present\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.message).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "f47c3dd3-56b5-4e24-84a8-44f6927ef52d",
+      "name": "Get Authenticated User",
+      "request": {
+        "description": {
+          "content": "Fetch the authenticated user profile. A pre-request script decodes the stored access token's JWT exp claim and transparently re-authenticates if it's missing or expiring soon, so this request works standalone, not only after Login - Valid Credentials.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "auth",
+            "me"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "description": {
+              "content": "Auto-populated after running Login - Valid Credentials (var: accessToken)",
+              "type": "text/plain"
+            },
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "0237545e-5076-4c01-9907-37d3eda79282",
+            "type": "text/javascript",
+            "exec": [
+              "function decodeJwtExp(token) {",
+              "    try {",
+              "        return JSON.parse(atob(token.split('.')[1])).exp;",
+              "    } catch (e) {",
+              "        return null;",
+              "    }",
+              "}",
+              "",
+              "const existingToken = pm.collectionVariables.get('accessToken');",
+              "const existingUserId = pm.collectionVariables.get('userId');",
+              "const nowSeconds = Math.floor(Date.now() / 1000);",
+              "const bufferSeconds = 60;",
+              "const exp = existingToken ? decodeJwtExp(existingToken) : null;",
+              "const needsReauth = !existingToken || !existingUserId || !exp || (exp - nowSeconds) < bufferSeconds;",
+              "",
+              "if (needsReauth) {",
+              "    pm.sendRequest({",
+              "        url: pm.variables.get('baseUrl') + '/auth/login',",
+              "        method: 'POST',",
+              "        header: { 'Content-Type': 'application/json' },",
+              "        body: {",
+              "            mode: 'raw',",
+              "            raw: JSON.stringify({ username: 'emilys', password: 'emilyspass', expiresInMins: 60 }),",
+              "        },",
+              "    }, (err, res) => {",
+              "        if (!err && res.code === 200) {",
+              "            const body = res.json();",
+              "            pm.collectionVariables.set('accessToken', body.accessToken);",
+              "            pm.collectionVariables.set('refreshToken', body.refreshToken);",
+              "            pm.collectionVariables.set('userId', body.id);",
+              "        }",
+              "    });",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "id": "643e3975-890a-42e2-ade4-cec95764aab1",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with user profile\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('Profile has required fields', () => {",
+              "    pm.expect(body.id).to.be.a('number');",
+              "    pm.expect(body.username).to.be.a('string').and.not.empty;",
+              "    pm.expect(body.email).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cc1581d2-24bc-471c-9152-956f9cab5568",
+      "name": "Get Authenticated User - Invalid Token",
+      "request": {
+        "description": {
+          "content": "Call /auth/me with a deliberately invalid Bearer token. Expected: 401.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "auth",
+            "me"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "description": {
+              "content": "Deliberately invalid token",
+              "type": "text/plain"
+            },
+            "key": "Authorization",
+            "value": "Bearer this-is-not-a-valid-token"
+          }
+        ],
+        "method": "GET"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "2df6d8c2-1361-4bb7-823b-eededfd8816d",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 401 for invalid auth token\", () => {",
+              "    pm.expect(pm.response.code).to.eql(401);",
+              "});",
+              "pm.test(\"Error message present\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.message).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "51d8f3c8-320a-409c-836c-1b1a7dee1810",
+      "name": "Refresh Token",
+      "request": {
+        "description": {
+          "content": "Exchange a refresh token for a new access token. Run Login - Valid Credentials first to populate {{refreshToken}}. Updates the stored tokens.",
+          "type": "text/plain"
+        },
+        "url": {
+          "path": [
+            "auth",
+            "refresh"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\",\n  \"expiresInMins\": 60\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "14596005-ca75-49cf-9583-229f35892a34",
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Returns 200 with new tokens\", () => {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('New tokens are strings', () => {",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.empty;",
+              "    pm.expect(body.refreshToken).to.be.a('string').and.not.empty;",
+              "});",
+              "if (pm.response.code === 200) {",
+              "    const body = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', body.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', body.refreshToken);",
+              "}",
+              "pm.test(\"Response time is under 2000ms\", () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [],
+  "info": {
+    "_postman_id": "69a143e6-7447-46e5-aff5-39b493d457c8",
+    "name": "auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Authentication endpoints: login, get current user, refresh token. The login request stores accessToken/refreshToken/userId as collection variables — every other collection in this repo depends on it running first.",
+      "type": "text/plain"
+    }
+  }
+}
