@@ -123,11 +123,13 @@ before that can succeed:
    Pages URL (`https://libin-samkutty.github.io/postman-newman-automation/`)
    goes live.
 
-No separate `gh-pages` branch is committed. `run-regression.sh` writes each
-report into a fresh `reports/<timestamp>/` folder, so both publish jobs
-generate a small `reports/index.html` redirect (pointing at that run's
-timestamped report) before deploying — that's what the Pages root URL
-actually serves.
+No separate `gh-pages` branch is committed. `npm run test:docker` (what both
+CI and nightly use) writes a single flat `reports/regression-report.html`,
+so both publish jobs generate a small `reports/index.html` redirect to that
+file before deploying — that's what the Pages root URL actually serves.
+(`run-regression.sh`, used by `npm run test:regression` locally, writes into
+timestamped `reports/<timestamp>/` folders instead — that path isn't used
+by these two workflows.)
 
 ## Reporting stack
 
