@@ -14,7 +14,7 @@ const builders = {
     'regression.collection.json': buildRegressionCollection,
 };
 
-const outDir = path.join(__dirname, '..', 'collections');
+const outDir = process.argv[2] || path.join(__dirname, '..', 'collections');
 fs.mkdirSync(outDir, { recursive: true });
 
 for (const [filename, build] of Object.entries(builders)) {
